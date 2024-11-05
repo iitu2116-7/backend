@@ -7,6 +7,6 @@
 /dataSources/
 /dataSources.local.xml
 
-.docker-compose.yml
-.Dockerfile
-.src/main/resources/application-sample.properties
+/docker-compose.yml
+/Dockerfile
+src/main/resources/application-sample.properties
