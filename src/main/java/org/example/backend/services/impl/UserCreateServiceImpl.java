@@ -33,7 +33,7 @@ public class UserCreateServiceImpl implements UserCreateService {
     @Override
     @Transactional
     public Pair<String, Long> create(SignUpRequest request) {
-        if (customerRepository.existsByUsername(request.getUsername())) {
+        if (customerRepository.existsByEmail(request.getEmail())) {
             return Pair.of("Пользователь с таким почтовым адресом уже существует", 0L);
         }
         if (request.getVerificationCode().isEmpty()) {
@@ -46,18 +46,18 @@ public class UserCreateServiceImpl implements UserCreateService {
 
     private Pair<String, Long> handleSmsCodeGeneration(SignUpRequest request) {
         int random_number = generateRandomCode();
-        saveVerificationCode(request.getUsername(), random_number);
+        saveVerificationCode(request.getEmail(), random_number);
         sendVerificationCode(request, random_number);
         return Pair.of("Код верификации отправлен", 0L);
     }
 
     private void handleCodeVerification(SignUpRequest request) {
-        boolean codeExists = verificationCodeRepository.existsByUsernameAndCode(request.getUsername(), request.getVerificationCode());
+        boolean codeExists = verificationCodeRepository.existsByEmailAndCode(request.getEmail(), request.getVerificationCode());
 
         if (codeExists) {
             Pair.of("Код верификации верный", 0L);
 
-            verificationCodeRepository.deleteByUsernameAndCode(request.getUsername(), request.getVerificationCode());
+            verificationCodeRepository.deleteByEmailAndCode(request.getEmail(), request.getVerificationCode());
         } else {
             Pair.of("Код верификации неверный", 0L);
         }
@@ -76,18 +76,18 @@ public class UserCreateServiceImpl implements UserCreateService {
     }
 
     private Pair<String, Long> handleVerificationCodeGenerationPasswordRecovery(SignUpRequest request) {
-        Customer customer = customerRepository.findByUsername(request.getUsername());
+        Customer customer = customerRepository.findByEmail(request.getEmail());
         if (customer == null){
             return Pair.of("Клиент отсутствует",0L);
         }
         int random_number = generateRandomCode();
-        saveVerificationCode(request.getUsername(), random_number);
+        saveVerificationCode(request.getEmail(), random_number);
         sendVerificationCode(request, random_number);
         return Pair.of("Код верификации отправлен", 0L);
     }
 
     private Pair<String, Long> handleVerificationForPassRecovery(SignUpRequest request) {
-        Customer customer = customerRepository.findByUsername(request.getUsername());
+        Customer customer = customerRepository.findByEmail(request.getEmail());
         if (customer == null) {
             throw new NoSuchElementException("Пользователь не найден");
         }
@@ -121,7 +121,7 @@ public class UserCreateServiceImpl implements UserCreateService {
                 request.getFirstName(),
                 random_number
         );
-        emailService.sendEmail(request.getUsername(), subject, message);
+        emailService.sendEmail(request.getEmail(), subject, message);
     }
 
     private int generateRandomCode() {
@@ -131,7 +131,7 @@ public class UserCreateServiceImpl implements UserCreateService {
     private void saveVerificationCode(String username, int code) {
         VerificationCode verificationCode = VerificationCode.builder()
                 .code(code)
-                .username(username)
+                .email(username)
                 .build();
         verificationCodeRepository.save(verificationCode);
     }
@@ -141,7 +141,7 @@ public class UserCreateServiceImpl implements UserCreateService {
                 .role(Role.RoleClient)
                 .firstname(request.getFirstName())
                 .lastname(request.getLastName())
-                .username(request.getUsername())
+                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .createdDate(new Date())
                 .build();
@@ -158,7 +158,7 @@ public class UserCreateServiceImpl implements UserCreateService {
     }
 
     public Customer getByUsername(String username) {
-        return customerRepository.findByUsernameOptional(username)
+        return customerRepository.findByEmailOptional(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
     }

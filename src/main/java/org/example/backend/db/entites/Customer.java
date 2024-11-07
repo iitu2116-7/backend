@@ -36,8 +36,8 @@ public class Customer extends BaseEntity implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "email")
+    private String email;
 
     private String photoUrl;
 
@@ -48,7 +48,7 @@ public class Customer extends BaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
 

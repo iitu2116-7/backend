@@ -54,8 +54,8 @@ public class AuthenticationService {
      */
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         try {
-            String email = request.getUsername();
-            Customer customer = customerRepository.findByUsername(email);
+            String email = request.getEmail();
+            Customer customer = customerRepository.findByEmail(email);
             if (customer != null && passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
                 var jwt = jwtService.generateToken(customer);
                 return new JwtAuthenticationResponse(jwt, "success");

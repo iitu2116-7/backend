@@ -14,5 +14,5 @@ import org.example.backend.db.BaseEntity;
 @Table(name = "verification_code")
 public class VerificationCode extends BaseEntity {
     private int code;
-    private String username;
+    private String email;
 }

@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VerificationCodeRepository extends JpaRepository<VerificationCode, Long> {
 
-    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM VerificationCode s WHERE s.username = :username AND s.code = :code")
-    boolean existsByUsernameAndCode(@Param("username")String username, @Param("code") String code);
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM VerificationCode s WHERE s.email = :email AND s.code = :code")
+    boolean existsByEmailAndCode(@Param("email")String email, @Param("code") String code);
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM VerificationCode v WHERE v.username = :username AND v.code = :code")
-    void deleteByUsernameAndCode(@Param("username") String username, @Param("code") String code);
+    @Query("DELETE FROM VerificationCode v WHERE v.email = :email AND v.code = :code")
+    void deleteByEmailAndCode(@Param("email") String email, @Param("code") String code);
 }
