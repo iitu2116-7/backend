@@ -11,4 +11,4 @@
 /Dockerfile
 *application-sample.properties
 
-/target/
+target/
