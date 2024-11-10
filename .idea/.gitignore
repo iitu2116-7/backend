@@ -7,9 +7,10 @@
 /dataSources/
 /dataSources.local.xml
 
-docker-compose.yml
 Dockerfile
+docker-compose.yml
 application-sample.properties
+
 
 /target/
 
