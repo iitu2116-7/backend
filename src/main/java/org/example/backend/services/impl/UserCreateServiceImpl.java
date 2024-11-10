@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.example.backend.db.entites.Customer;
 import org.example.backend.db.entites.VerificationCode;
+import org.example.backend.db.enums.Currency;
 import org.example.backend.db.enums.Role;
 import org.example.backend.db.repositories.CustomerRepository;
 import org.example.backend.db.repositories.VerificationCodeRepository;
@@ -109,7 +110,7 @@ public class UserCreateServiceImpl implements UserCreateService {
         String message = String.format(
                 "<html>" +
                         "<body>" +
-                        "<img src='resources/static/logoSmartMoney.png' alt='Smart Money Logo' style='width:150px;height:auto;'/><br/><br/>" +
+                        "<img src='http://91.243.71.131:9000/smartmoney/logoSmartMoney.png' alt='Smart Money Logo' style='width:300px;height:auto;'/><br/><br/>" +
                         "Здравствуйте, %s!<br/><br/>" +
                         "Мы рады приветствовать вас в Smart Money. Чтобы завершить регистрацию и подтвердить вашу почту, " +
                         "введите, пожалуйста, следующий код верификации. Если вы не запрашивали регистрацию на нашем сайте, " +
@@ -143,6 +144,7 @@ public class UserCreateServiceImpl implements UserCreateService {
                 .lastname(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .preferredCurrency(Currency.KZT)
                 .createdDate(new Date())
                 .build();
     }

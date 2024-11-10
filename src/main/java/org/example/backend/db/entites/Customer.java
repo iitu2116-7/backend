@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.example.backend.db.BaseEntity;
+import org.example.backend.db.enums.Currency;
 import org.example.backend.db.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,6 +40,10 @@ public class Customer extends BaseEntity implements UserDetails {
     @Column(name = "email")
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    private Currency preferredCurrency;
+
+    @Column(name = "photoUrl")
     private String photoUrl;
 
     @Override
