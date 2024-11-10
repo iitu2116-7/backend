@@ -7,9 +7,9 @@
 /dataSources/
 /dataSources.local.xml
 
-/docker-compose.yml
-/Dockerfile
-*application-sample.properties
+docker-compose.yml
+Dockerfile
+application-sample.properties
 
 /target/
 
