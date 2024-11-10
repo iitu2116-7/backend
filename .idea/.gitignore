@@ -12,3 +12,5 @@
 *application-sample.properties
 
 /target/
+
+.DS_Store
