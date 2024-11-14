@@ -1,5 +1,6 @@
 package org.example.backend.services.utilServices;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.example.backend.db.entites.CurrencyPrices;
 import org.example.backend.db.repositories.CurrencyPricesRepository;
@@ -19,15 +20,16 @@ import java.util.Scanner;
 @Service
 @AllArgsConstructor
 public class CurrencyPricesService {
-    private final CurrencyPricesRepository exchangeRateRepository;
+    private final CurrencyPricesRepository currencyPricesRepository;
 
-    public CurrencyPrices getExchangeRate() {
-        return exchangeRateRepository.findFirstExchangeRate();
+    public CurrencyPrices getCurrencyPrices() {
+        return currencyPricesRepository.findFirstCurrencyPrice();
     }
 
 
+    @Transactional
     @Scheduled(fixedRate = 3600000)
-    public void updateExchangeRates() {
+    public void updateCurrencyPrices() {
         try {
             String html = getHtmlFromApi();
 
@@ -38,7 +40,7 @@ public class CurrencyPricesService {
             double gbpValue = getCurrencyValue(html, "GBP");
             double cnyValue = getCurrencyValue(html, "CNY");
 
-            CurrencyPrices currencyPrices = exchangeRateRepository.findFirstExchangeRate();
+            CurrencyPrices currencyPrices = currencyPricesRepository.findFirstCurrencyPrice();
             if (currencyPrices != null) {
                 currencyPrices.setUsd(usdValue);
                 currencyPrices.setEur(eurValue);
@@ -47,8 +49,9 @@ public class CurrencyPricesService {
                 currencyPrices.setGbp(gbpValue);
                 currencyPrices.setCny(cnyValue);
                 currencyPrices.setUpdateDate(new Date());
-                exchangeRateRepository.save(currencyPrices);
-                System.out.println("Exchange rates updated successfully.");
+                currencyPricesRepository.save(currencyPrices);
+                System.out.println(usdValue + " " + eurValue + " " + rubValue + " " + kgsValue);
+                System.out.println("Currency prices updated successfully.");
             } else {
                 CurrencyPrices newCurrencyPrices = new CurrencyPrices();
                 newCurrencyPrices.setUsd(usdValue);
@@ -58,7 +61,7 @@ public class CurrencyPricesService {
                 newCurrencyPrices.setGbp(gbpValue);
                 newCurrencyPrices.setCny(cnyValue);
                 newCurrencyPrices.setCreatedDate(new Date());
-                exchangeRateRepository.save(newCurrencyPrices);
+                System.out.println(usdValue + " " + eurValue + " " + rubValue + " " + kgsValue);
                 System.out.println("New currency prices created.");
             }
         } catch (IOException e) {

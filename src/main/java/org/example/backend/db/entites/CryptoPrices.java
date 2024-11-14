@@ -20,18 +20,24 @@ public class CryptoPrices extends BaseEntity {
     @Column(name = "symbol")
     private String symbol;
 
-    @Column(name = "price")
-    private double price;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "open_price")
-    private double openPrice;
-
-    @Column(name = "high_price")
-    private double highPrice;
-
-    @Column(name = "low_price")
-    private double lowPrice;
+    @Column(name = "last_price")
+    private Double lastPrice;
 
     @Column(name = "volume")
-    private double volume;
+    private Double volume;
+
+    @Column(name = "price_change")
+    private Double priceChange;
+
+    @Column(name = "price_change_percent")
+    private Double priceChangePercent;
+
+    @Column(name = "high_price")
+    private Double highPrice;
+
+    @Column(name = "low_price")
+    private Double lowPrice;
 }

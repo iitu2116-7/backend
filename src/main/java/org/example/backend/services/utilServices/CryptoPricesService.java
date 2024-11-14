@@ -1,44 +1,91 @@
 package org.example.backend.services.utilServices;
 
-import lombok.AllArgsConstructor;
-
+import lombok.RequiredArgsConstructor;
 import org.example.backend.db.entites.CryptoPrices;
 import org.example.backend.db.repositories.CryptoPricesRepository;
+import org.example.backend.dto.dtos.CryptoPricesDTO;
+import org.example.backend.dto.responses.BinancePriceResponse;
+import org.example.backend.utils.CryptoPricesMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CryptoPricesService {
 
     private final CryptoPricesRepository cryptoPricesRepository;
+    private final CryptoPricesMapper cryptoPricesMapper;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    /**
-     * Метод для обновления данных о криптовалюте
-     * @param symbol Символ криптовалюты (например, "BTCUSDT")
-     * @param price Последняя цена
-     * @param openPrice Цена открытия
-     * @param highPrice Максимальная цена за день
-     * @param lowPrice Минимальная цена за день
-     * @param volume Объем торгов
-     */
-    public void updateCryptoPrice(String symbol, double price, double openPrice, double highPrice, double lowPrice, double volume) {
-        CryptoPrices cryptoPrice = cryptoPricesRepository.findBySymbol(symbol);
+    private static final String BINANCE_API_URL = "https://api.binance.com/api/v3/ticker/24hr";
 
-        if (cryptoPrice == null) {
+    @Scheduled(fixedRate = 3600000)
+    public void updateCryptoPrices() {
+        try {
+            List<CryptoPrices> cryptoPricesList = cryptoPricesRepository.findAll();
+            if (cryptoPricesList.isEmpty()) {
+                System.err.println("No crypto symbols found in the database to update.");
+                return;
+            }
 
-            cryptoPrice = new CryptoPrices();
-            cryptoPrice.setSymbol(symbol);
+            BinancePriceResponse[] responses = restTemplate.getForObject(BINANCE_API_URL, BinancePriceResponse[].class);
+
+            if (responses != null) {
+                for (BinancePriceResponse response : responses) {
+                    cryptoPricesList.stream()
+                            .filter(cryptoPrice -> cryptoPrice.getSymbol().equals(response.getSymbol()))
+                            .forEach(cryptoPrice -> {
+                                cryptoPrice.setLastPrice(parseDoubleOrNull(response.getLastPrice()));
+                                cryptoPrice.setPriceChange(parseDoubleOrNull(response.getPriceChange()));
+                                cryptoPrice.setPriceChangePercent(parseDoubleOrNull(response.getPriceChangePercent()));
+                                cryptoPrice.setHighPrice(parseDoubleOrNull(response.getHighPrice()));
+                                cryptoPrice.setLowPrice(parseDoubleOrNull(response.getLowPrice()));
+                                cryptoPrice.setVolume(parseDoubleOrNull(response.getVolume()));
+                                cryptoPrice.setUpdateDate(new Date());
+
+                                cryptoPricesRepository.save(cryptoPrice);
+                                System.out.println("Updated price");
+                            });
+                }
+            } else {
+                System.err.println("Failed to fetch prices from Binance API.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error while updating crypto prices: " + e.getMessage());
         }
+    }
 
-        cryptoPrice.setPrice(price);
-        cryptoPrice.setOpenPrice(openPrice);
-        cryptoPrice.setHighPrice(highPrice);
-        cryptoPrice.setLowPrice(lowPrice);
-        cryptoPrice.setVolume(volume);
-        cryptoPrice.setUpdateDate(new Date());
+    private Double parseDoubleOrNull(String value) {
+        return (value != null && !value.trim().isEmpty()) ? Double.parseDouble(value.trim()) : null;
+    }
 
-        cryptoPricesRepository.save(cryptoPrice);
+
+    public Page<CryptoPricesDTO> getCurrentCryptoPricesByFilter(String filter, Pageable pageable) {
+        Page<CryptoPrices> page = switch (filter.toLowerCase()) {
+            case "popular" -> {
+                List<String> popularSymbols = List.of("BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT");
+                yield cryptoPricesRepository.findAllBySymbolIn(popularSymbols, pageable);
+            }
+            case "highest" ->
+                    cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "lastPrice")));
+            case "lowest" ->
+                    cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "lastPrice")));
+            case "newest" ->
+                    cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "updateDate")));
+            case "recent_changes" ->
+                    cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "priceChangePercent")));
+            default ->
+                    cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "symbol")));
+        };
+
+        return page.map(cryptoPricesMapper::toDto);
     }
 }

@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CurrencyPricesRepository extends JpaRepository<CurrencyPrices, Long> {
     @Query("SELECT er FROM CurrencyPrices er ORDER BY er.id ASC")
-    CurrencyPrices findFirstExchangeRate();
+    CurrencyPrices findFirstCurrencyPrice();
 }
