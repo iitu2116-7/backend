@@ -48,7 +48,7 @@ public class CurrencyPricesService {
                 currencyPrices.setKgs(kgsValue);
                 currencyPrices.setGbp(gbpValue);
                 currencyPrices.setCny(cnyValue);
-                currencyPrices.setUpdateDate(new Date());
+                currencyPrices.setUpdatedDate(new Date());
                 currencyPricesRepository.save(currencyPrices);
                 System.out.println(usdValue + " " + eurValue + " " + rubValue + " " + kgsValue);
                 System.out.println("Currency prices updated successfully.");

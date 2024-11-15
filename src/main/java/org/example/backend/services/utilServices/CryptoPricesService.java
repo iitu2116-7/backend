@@ -49,7 +49,7 @@ public class CryptoPricesService {
                                 cryptoPrice.setHighPrice(parseDoubleOrNull(response.getHighPrice()));
                                 cryptoPrice.setLowPrice(parseDoubleOrNull(response.getLowPrice()));
                                 cryptoPrice.setVolume(parseDoubleOrNull(response.getVolume()));
-                                cryptoPrice.setUpdateDate(new Date());
+                                cryptoPrice.setUpdatedDate(new Date());
 
                                 cryptoPricesRepository.save(cryptoPrice);
                                 System.out.println("Updated price");

@@ -21,5 +21,5 @@ public abstract class BaseEntity {
     private Date createdDate;
 
     @Column(name = "updatedDate")
-    private Date updateDate;
+    private Date updatedDate;
 }

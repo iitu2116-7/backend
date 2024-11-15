@@ -18,7 +18,7 @@ public class CryptoPricesMapper {
                 cryptoPrices.getPriceChangePercent(),
                 cryptoPrices.getHighPrice(),
                 cryptoPrices.getLowPrice(),
-                cryptoPrices.getUpdateDate()
+                cryptoPrices.getUpdatedDate()
         );
     }
 

@@ -28,6 +28,9 @@ public class Moderator extends BaseEntity implements UserDetails {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Column(name = "photo_url")
+    private String photoUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role",nullable = false)
     private Role role;

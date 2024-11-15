@@ -43,8 +43,11 @@ public class Customer extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Currency preferredCurrency;
 
-    @Column(name = "photoUrl")
+    @Column(name = "photo_url")
     private String photoUrl;
+
+    @Column(name = "is_blocked")
+    private boolean isBlocked;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
