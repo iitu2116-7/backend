@@ -7,6 +7,7 @@ import org.example.backend.services.utilServices.CryptoPricesService;
 import org.example.backend.services.utilServices.CurrencyPricesService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class PriceController {
     @GetMapping("/current/crypto-currency-prices")
     public ResponseEntity<Page<CryptoPricesDTO>> getCryptoPricesByFilter(
             @RequestParam(required = false, defaultValue = "popular") String filter,
-            Pageable pageable) {
+            @PageableDefault Pageable pageable) {
         Page<CryptoPricesDTO> result = cryptoPricesService.getCurrentCryptoPricesByFilter(filter, pageable);
         return ResponseEntity.ok(result);
     }

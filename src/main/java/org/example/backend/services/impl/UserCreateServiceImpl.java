@@ -2,6 +2,7 @@ package org.example.backend.services.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.example.backend.db.entites.Account;
 import org.example.backend.db.entites.Customer;
 import org.example.backend.db.entites.VerificationCode;
 import org.example.backend.db.enums.Currency;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
@@ -102,7 +104,10 @@ public class UserCreateServiceImpl implements UserCreateService {
     private Pair<String,Long> handleCustomerCreate(SignUpRequest request){
         Customer customer = createCustomer(request);
         Customer customerSave = customerRepository.save(customer);
-        return Pair.of("Пользователь создан",customerSave.getId());
+        Account account = new Account();
+        account.setCustomer(customer);
+        account.setBalanceInKZT(BigDecimal.valueOf(0));
+        return Pair.of("Пользователь создан", customerSave.getId());
     }
 
     private void sendVerificationCode(SignUpRequest request, int random_number) {

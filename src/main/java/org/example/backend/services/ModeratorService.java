@@ -6,5 +6,5 @@ import org.example.backend.dto.requests.UpdateProfileRequest;
 public interface ModeratorService {
     void toggleBlockedStatus(Long customerId);
 
-    Moderator updateProfile(UpdateProfileRequest request);
+    Moderator updateProfile(Long customerId, UpdateProfileRequest request);
 }

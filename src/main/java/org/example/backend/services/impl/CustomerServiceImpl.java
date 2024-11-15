@@ -5,12 +5,11 @@ import io.minio.PutObjectArgs;
 import io.minio.errors.MinioException;
 import lombok.AllArgsConstructor;
 import org.example.backend.db.entites.Customer;
-import org.example.backend.db.entites.Moderator;
+import org.example.backend.db.enums.Currency;
 import org.example.backend.db.repositories.CustomerRepository;
-import org.example.backend.db.repositories.ModeratorRepository;
 import org.example.backend.dto.requests.UpdateProfileRequest;
 import org.example.backend.dto.responses.MinioConstants;
-import org.example.backend.services.ModeratorService;
+import org.example.backend.services.CustomerService;
 import org.example.backend.services.utilServices.EntityUpdateUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,37 +26,39 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class ModeratorServiceImpl implements ModeratorService {
-    private final ModeratorRepository moderatorRepository;
-    private final CustomerRepository customerRepository;
+public class CustomerServiceImpl implements CustomerService {
+    private CustomerRepository customerRepository;
 
     private final MinioClient minioClient;
     private static final String BUCKET_NAME = "profile-photo";
 
-    @Override
-    public void toggleBlockedStatus(Long customerId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new IllegalArgumentException("Customer with ID " + customerId + " not found"));
-
-        customer.setBlocked(!customer.isBlocked());
-        customerRepository.save(customer);
-    }
-
 
     @Override
-    public Moderator updateProfile(Long customerId, UpdateProfileRequest request) {
-        Moderator existingModerator = moderatorRepository.findById(customerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Moderator not found"));
+    public Customer updateProfile(Long customerId, UpdateProfileRequest request) {
+        Customer existingCustomer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
 
-        EntityUpdateUtil.updateField(existingModerator::setEmail, request.getEmail());
+        EntityUpdateUtil.updateField(existingCustomer::setEmail, request.getEmail());
+        EntityUpdateUtil.updateField(existingCustomer::setFirstname, request.getFirstname());
+        EntityUpdateUtil.updateField(existingCustomer::setLastname, request.getLastname());
+
+        Optional.ofNullable(request.getPreferredCurrency())
+                .map(String::toUpperCase)
+                .ifPresent(currency -> {
+                    try {
+                        existingCustomer.setPreferredCurrency(Currency.valueOf(currency));
+                    } catch (IllegalArgumentException e) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid preferred currency value");
+                    }
+                });
 
         Optional.ofNullable(request.getProfilePicture())
                 .filter(file -> !file.isEmpty())
                 .map(this::uploadPhotoToMinio)
-                .ifPresent(existingModerator::setPhotoUrl);
+                .ifPresent(existingCustomer::setPhotoUrl);
 
-        existingModerator.setUpdatedDate(new Date());
-        return moderatorRepository.save(existingModerator);
+        existingCustomer.setUpdatedDate(new Date());
+        return customerRepository.save(existingCustomer);
     }
 
 
@@ -78,5 +79,4 @@ public class ModeratorServiceImpl implements ModeratorService {
             throw new RuntimeException("Ошибка при загрузке файла: " + e.getMessage(), e);
         }
     }
-
 }

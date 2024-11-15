@@ -5,8 +5,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class UpdateProfileRequest {
-    private Long id;
     private String email;
+    private String firstname;
+    private String lastname;
+    private String preferredCurrency;
     private MultipartFile profilePicture;
 }
 
