@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 
 import org.example.backend.db.entites.Customer;
+import org.example.backend.db.entites.Moderator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,22 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         Map<String,Object> claims = new HashMap<>();
         if (userDetails instanceof Customer customUserDetails){
+            claims.put("id",customUserDetails.getId());
+            claims.put("role",customUserDetails.getRole());
+        }
+        return generateToken(claims,userDetails);
+    }
+
+
+    /**
+     * Генерация токена модератор
+     *
+     * @param userDetails данные модератора
+     * @return токен
+     */
+    public String generateTokenModerator(UserDetails userDetails){
+        Map<String,Object> claims = new HashMap<>();
+        if (userDetails instanceof Moderator customUserDetails){
             claims.put("id",customUserDetails.getId());
             claims.put("role",customUserDetails.getRole());
         }

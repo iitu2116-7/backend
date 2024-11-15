@@ -80,8 +80,6 @@ public class CryptoPricesService {
                     cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "lastPrice")));
             case "newest" ->
                     cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "updateDate")));
-            case "recent_changes" ->
-                    cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "priceChangePercent")));
             default ->
                     cryptoPricesRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "symbol")));
         };

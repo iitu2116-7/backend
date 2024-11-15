@@ -4,7 +4,9 @@ package org.example.backend.services.utilServices;
 import lombok.RequiredArgsConstructor;
 
 import org.example.backend.db.entites.Customer;
+import org.example.backend.db.entites.Moderator;
 import org.example.backend.db.repositories.CustomerRepository;
+import org.example.backend.db.repositories.ModeratorRepository;
 import org.example.backend.dto.requests.SignInRequest;
 import org.example.backend.dto.requests.SignUpRequest;
 import org.example.backend.dto.responses.JwtAuthenticationResponse;
@@ -22,6 +24,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModeratorRepository moderatorRepository;
 
 
     /**
@@ -58,6 +61,12 @@ public class AuthenticationService {
             Customer customer = customerRepository.findByEmail(email);
             if (customer != null && passwordEncoder.matches(request.getPassword(), customer.getPassword())) {
                 var jwt = jwtService.generateToken(customer);
+                return new JwtAuthenticationResponse(jwt, "success");
+            }
+
+            Moderator moderator = moderatorRepository.findByEmail(email);
+            if (moderator != null && passwordEncoder.matches(request.getPassword(), moderator.getPassword())) {
+                var jwt = jwtService.generateTokenModerator(moderator);
                 return new JwtAuthenticationResponse(jwt, "success");
             }
 
