@@ -21,4 +21,6 @@ public class Notification extends BaseEntity {
     @ManyToOne
     private Customer customer;
 
+    @Column(name = "is_read")
+    private boolean isRead;
 }

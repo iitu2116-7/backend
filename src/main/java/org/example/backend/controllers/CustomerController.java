@@ -6,8 +6,15 @@ import org.example.backend.dto.dtos.CustomerDTO;
 import org.example.backend.dto.dtos.TransactionDTO;
 import org.example.backend.dto.requests.UpdateProfileRequest;
 import org.example.backend.services.CustomerService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -32,17 +39,20 @@ public class CustomerController extends BaseController {
     }
 
     @GetMapping("/get-history")
-    public ResponseEntity<TransactionDTO> getTransactionHistory() {
+    public ResponseEntity<Page<TransactionDTO>> getTransactionHistory(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dateFrom,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dateTo,
+            @PageableDefault Pageable pageable) {
         Long customerId = Long.valueOf(data.get("id"));
-        TransactionDTO transaction = customerService.getTransactionHistory(customerId);
+        Page<TransactionDTO> transaction = customerService.getTransactionHistory(customerId, dateFrom, dateTo, pageable);
         return ResponseEntity.ok(transaction);
     }
 
-    @GetMapping("/get-notification")
-    public ResponseEntity<Notification> getNotifications() {
+    @GetMapping("/get-notifications")
+    public ResponseEntity<List<Notification>> getNotifications() {
         Long customerId = Long.valueOf(data.get("id"));
-        Notification notification = customerService.getNotifications(customerId);
-        return ResponseEntity.ok(notification);
+        List<Notification> notifications = customerService.getNotifications(customerId);
+        return ResponseEntity.ok(notifications);
     }
 
 
