@@ -1,14 +1,14 @@
 package org.example.backend.utils;
 
 import org.example.backend.db.entites.CryptoPrices;
-import org.example.backend.dto.dtos.CryptoPricesDTO;
+import org.example.backend.dto.dtos.CryptoDTO;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CryptoPricesMapper {
 
-    public CryptoPricesDTO toDto(CryptoPrices cryptoPrices) {
-        return new CryptoPricesDTO(
+    public CryptoDTO toDto(CryptoPrices cryptoPrices) {
+        return new CryptoDTO(
                 cryptoPrices.getId(),
                 cryptoPrices.getSymbol(),
                 cryptoPrices.getName(),

@@ -2,14 +2,13 @@ package org.example.backend.controllers;
 
 import lombok.AllArgsConstructor;
 import org.example.backend.db.entites.Moderator;
+import org.example.backend.dto.dtos.CustomerDTO;
+import org.example.backend.dto.dtos.ModeratorDTO;
 import org.example.backend.dto.requests.UpdateProfileRequest;
 import org.example.backend.services.ModeratorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -28,11 +27,18 @@ public class ModeratorController extends BaseController {
     }
 
     @PutMapping("/moderators/update-profile")
-    public ResponseEntity<Moderator> updateModeratorProfile(
+    public ResponseEntity<ModeratorDTO> updateModeratorProfile(
             @ModelAttribute UpdateProfileRequest request) {
         Long customerId = Long.valueOf(data.get("id"));
-        Moderator updatedModerator = moderatorService.updateProfile(customerId, request);
+        ModeratorDTO updatedModerator = moderatorService.updateProfile(customerId, request);
         return ResponseEntity.ok(updatedModerator);
+    }
+
+    @GetMapping("/moderators/get-profile")
+    public ResponseEntity<ModeratorDTO> getProfile() {
+        Long moderatorId = Long.valueOf(data.get("id"));
+        ModeratorDTO customer = moderatorService.getProfile(moderatorId);
+        return ResponseEntity.ok(customer);
     }
 
 }

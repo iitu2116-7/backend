@@ -39,15 +39,14 @@ public class AuthenticationService {
         try {
             Pair<String, Long> result = userCreateService.create(request);
             if (result.getFirst().equals("Пользователь создан")){
-
                 var customer = customerRepository.getReferenceById(result.getSecond());
                 var jwt = jwtService.generateToken(customer);
-                return new JwtAuthenticationResponse(jwt, result.getFirst());
-            }else {
-                return new JwtAuthenticationResponse(null,result.getFirst());
+                return new JwtAuthenticationResponse(jwt, null, result.getFirst());
+            } else {
+                return new JwtAuthenticationResponse(null, null, result.getFirst());
             }
-        }catch (BadCredentialsException ex) {
-            return new JwtAuthenticationResponse(null, "Неверно учетные данные");
+        } catch (BadCredentialsException ex) {
+            return new JwtAuthenticationResponse(null, null, "Неверно учетные данные");
         }
     }
 
@@ -64,16 +63,16 @@ public class AuthenticationService {
         Customer customer = customerRepository.findByEmail(email);
         if (isValidCustomer(customer, password)) {
             var jwt = jwtService.generateToken(customer);
-            return new JwtAuthenticationResponse(jwt, "success");
+            return new JwtAuthenticationResponse(jwt, String.valueOf(customer.getRole()),"success");
         }
 
         Moderator moderator = moderatorRepository.findByEmail(email);
         if (isValidModerator(moderator, password)) {
             var jwt = jwtService.generateTokenModerator(moderator);
-            return new JwtAuthenticationResponse(jwt, "success");
+            return new JwtAuthenticationResponse(jwt, String.valueOf(moderator.getRole()), "success");
         }
 
-        return new JwtAuthenticationResponse(null, "Неверные учетные данные");
+        return new JwtAuthenticationResponse(null, null, "Неверные учетные данные");
     }
 
     private boolean isValidCustomer(Customer customer, String password) {
@@ -89,7 +88,5 @@ public class AuthenticationService {
     private boolean isValidModerator(Moderator moderator, String password) {
         return moderator != null && passwordEncoder.matches(password, moderator.getPassword());
     }
-
-
 }
 

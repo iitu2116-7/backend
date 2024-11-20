@@ -1,9 +1,11 @@
 package org.example.backend.services.utilServices;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.db.entites.CryptoPrices;
 import org.example.backend.db.repositories.CryptoPricesRepository;
-import org.example.backend.dto.dtos.CryptoPricesDTO;
+import org.example.backend.dto.dtos.CryptoDTO;
+import org.example.backend.dto.dtos.ModeratorDTO;
 import org.example.backend.dto.responses.BinancePriceResponse;
 import org.example.backend.utils.CryptoPricesMapper;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +71,7 @@ public class CryptoPricesService {
     }
 
 
-    public Page<CryptoPricesDTO> getCurrentCryptoPricesByFilter(String filter, Pageable pageable) {
+    public Page<CryptoDTO> getCurrentCryptoPricesByFilter(String filter, Pageable pageable) {
         Page<CryptoPrices> page = switch (filter.toLowerCase()) {
             case "popular" -> {
                 List<String> popularSymbols = List.of("BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT");
@@ -85,5 +88,13 @@ public class CryptoPricesService {
         };
 
         return page.map(cryptoPricesMapper::toDto);
+    }
+
+    public CryptoDTO getCrypto(Long cryptoId) {
+        Objects.requireNonNull(cryptoId, "ID cannot be null");
+
+        return cryptoPricesRepository.findById(cryptoId)
+                .map(cryptoPricesMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("NOT FOUND"));
     }
 }

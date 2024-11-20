@@ -13,5 +13,6 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Ответ с токеном доступа")
 public class JwtAuthenticationResponse {
     private String token;
+    private String role;
     private String message;
 }

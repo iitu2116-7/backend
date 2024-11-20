@@ -3,14 +3,17 @@ package org.example.backend.services.impl;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.errors.MinioException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.example.backend.db.entites.Customer;
 import org.example.backend.db.enums.Currency;
 import org.example.backend.db.repositories.CustomerRepository;
+import org.example.backend.dto.dtos.CustomerDTO;
 import org.example.backend.dto.requests.UpdateProfileRequest;
 import org.example.backend.dto.responses.MinioConstants;
 import org.example.backend.services.CustomerService;
 import org.example.backend.services.utilServices.EntityUpdateUtil;
+import org.example.backend.utils.CustomerMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,20 +24,30 @@ import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-    private CustomerRepository customerRepository;
-
+    private final CustomerMapper customerMapper;
+    private final CustomerRepository customerRepository;
     private final MinioClient minioClient;
     private static final String BUCKET_NAME = "profile-photo";
 
 
     @Override
-    public Customer updateProfile(Long customerId, UpdateProfileRequest request) {
+    public CustomerDTO getProfile(Long customerId) {
+        Objects.requireNonNull(customerId, "ID cannot be null");
+
+        return customerRepository.findById(customerId)
+                .map(customerMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("NOT FOUND"));
+    }
+
+    @Override
+    public CustomerDTO updateProfile(Long customerId, UpdateProfileRequest request) {
         Customer existingCustomer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
 
@@ -58,7 +71,9 @@ public class CustomerServiceImpl implements CustomerService {
                 .ifPresent(existingCustomer::setPhotoUrl);
 
         existingCustomer.setUpdatedDate(new Date());
-        return customerRepository.save(existingCustomer);
+        customerRepository.save(existingCustomer);
+
+        return customerMapper.toDto(existingCustomer);
     }
 
 
