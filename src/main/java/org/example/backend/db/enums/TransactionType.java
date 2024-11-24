@@ -8,8 +8,8 @@ import lombok.Getter;
 public enum TransactionType {
     DEPOSIT("Deposit", "Пополнение счета"),
     WITHDRAWAL("Withdrawal", "Вывод средств"),
-    EXCHANGE("Exchange", "Обмен валюты"),
-    INVESTMENT("Investment", "Инвестиция");
+    PURCHASE("Purchase", "Инвестиция"),
+    SELL("Sell", "Продажа");
 
     private final String code;
     private final String description;

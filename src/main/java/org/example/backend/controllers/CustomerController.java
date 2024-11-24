@@ -1,8 +1,8 @@
 package org.example.backend.controllers;
 
 import lombok.AllArgsConstructor;
-import org.example.backend.db.entites.Notification;
 import org.example.backend.dto.dtos.CustomerDTO;
+import org.example.backend.dto.dtos.NotificationDTO;
 import org.example.backend.dto.dtos.TransactionDTO;
 import org.example.backend.dto.requests.UpdateProfileRequest;
 import org.example.backend.services.CustomerService;
@@ -49,9 +49,9 @@ public class CustomerController extends BaseController {
     }
 
     @GetMapping("/get-notifications")
-    public ResponseEntity<List<Notification>> getNotifications() {
+    public ResponseEntity<List<NotificationDTO>> getNotifications() {
         Long customerId = Long.valueOf(data.get("id"));
-        List<Notification> notifications = customerService.getNotifications(customerId);
+        List<NotificationDTO> notifications = customerService.getNotifications(customerId);
         return ResponseEntity.ok(notifications);
     }
 

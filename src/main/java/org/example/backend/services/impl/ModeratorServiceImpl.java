@@ -41,7 +41,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     @Override
     public void toggleBlockedStatus(Long customerId) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new IllegalArgumentException("Customer with ID " + customerId + " not found"));
+                .orElseThrow(() -> new IllegalArgumentException("NOT FOUND"));
 
         customer.setBlocked(!customer.isBlocked());
         customerRepository.save(customer);
@@ -51,7 +51,7 @@ public class ModeratorServiceImpl implements ModeratorService {
     @Override
     public ModeratorDTO updateProfile(Long customerId, UpdateProfileRequest request) {
         Moderator existingModerator = moderatorRepository.findById(customerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Moderator not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "NOT FOUND"));
 
         EntityUpdateUtil.updateField(existingModerator::setEmail, request.getEmail());
 

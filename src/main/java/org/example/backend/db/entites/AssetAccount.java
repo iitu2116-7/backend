@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.backend.db.BaseEntity;
-import org.example.backend.db.enums.TransactionType;
 
 import java.math.BigDecimal;
 
@@ -15,25 +14,23 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "transactions")
-public class Transaction extends BaseEntity {
+@Table(name = "asset_accounts")
+public class AssetAccount extends BaseEntity {
 
     @JoinColumn(name = "customer")
     @ManyToOne
     private Customer customer;
 
-    @JoinColumn(name = "account")
+    @JoinColumn(name = "crypto")
     @ManyToOne
-    private Account account;
+    private CryptoPrices crypto;
 
-    @Column(name = "amount")
-    private BigDecimal amountInKZT;
+    @Column(name = "quantity")
+    private BigDecimal quantity;
 
-    @Column(name = "crypto_amount")
-    private BigDecimal amountInCrypto;
+    @Column(name = "purchased_amount")
+    private BigDecimal purchasedAmount;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionType transactionType;
-
-
+    @Column(name = "profit")
+    private BigDecimal profit;
 }

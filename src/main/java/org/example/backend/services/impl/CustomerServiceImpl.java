@@ -12,12 +12,14 @@ import org.example.backend.db.repositories.CustomerRepository;
 import org.example.backend.db.repositories.NotificationRepository;
 import org.example.backend.db.repositories.TransactionRepository;
 import org.example.backend.dto.dtos.CustomerDTO;
+import org.example.backend.dto.dtos.NotificationDTO;
 import org.example.backend.dto.dtos.TransactionDTO;
 import org.example.backend.dto.requests.UpdateProfileRequest;
 import org.example.backend.dto.responses.MinioConstants;
 import org.example.backend.services.CustomerService;
 import org.example.backend.services.utilServices.EntityUpdateUtil;
 import org.example.backend.utils.CustomerMapper;
+import org.example.backend.utils.NotificationMapper;
 import org.example.backend.utils.TransactionMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
     private static final String BUCKET_NAME = "profile-photo";
     private final TransactionMapper transactionMapper;
     private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
     @Override
     public CustomerDTO getProfile(Long customerId) {
@@ -57,7 +60,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDTO updateProfile(Long customerId, UpdateProfileRequest request) {
         Customer existingCustomer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "NOT FOUND"));
 
         EntityUpdateUtil.updateField(existingCustomer::setEmail, request.getEmail());
         EntityUpdateUtil.updateField(existingCustomer::setFirstname, request.getFirstname());
@@ -118,9 +121,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Notification> getNotifications(Long customerId) {
+    public List<NotificationDTO> getNotifications(Long customerId) {
         Objects.requireNonNull(customerId, "Customer ID cannot be null");
-        return notificationRepository.findByCustomerId(customerId);
+        List<Notification> notifications = notificationRepository.findByCustomerId(customerId);
+        if (notifications.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return notificationMapper.toDto(notifications);
     }
 
 

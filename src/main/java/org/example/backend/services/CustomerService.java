@@ -1,7 +1,7 @@
 package org.example.backend.services;
 
-import org.example.backend.db.entites.Notification;
 import org.example.backend.dto.dtos.CustomerDTO;
+import org.example.backend.dto.dtos.NotificationDTO;
 import org.example.backend.dto.dtos.TransactionDTO;
 import org.example.backend.dto.requests.UpdateProfileRequest;
 import org.springframework.data.domain.Page;
@@ -17,5 +17,5 @@ public interface CustomerService {
 
     Page<TransactionDTO> getTransactionHistory(Long customerId, Date dateFrom, Date dateTo, Pageable pageable);
 
-    List<Notification> getNotifications(Long customerId);
+    List<NotificationDTO> getNotifications(Long customerId);
 }

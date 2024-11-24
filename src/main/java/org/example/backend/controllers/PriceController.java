@@ -27,7 +27,7 @@ public class PriceController {
         if (currencyPrices != null) {
             return ResponseEntity.ok(currencyPrices);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Exchange rate data not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NOT FOUND");
         }
     }
 
